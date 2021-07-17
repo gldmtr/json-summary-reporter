@@ -3,7 +3,7 @@ module.exports = {
 		"src/**/*"
 	],
 	"coverageReporters": [
-		"text", "text-summary", "json-summary"
+		"text", "text-summary", "json-summary", "lcovonly"
 	],
 	"reporters": ["default", "jest-junit"]
 }
