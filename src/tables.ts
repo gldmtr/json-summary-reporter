@@ -15,10 +15,10 @@ export const getTableRow = (header: string, data: IComparisonMetrics): string =>
 			outputRow.push(`${column.current}%`);
 		} else if (column.current < column.base) {
 			// coverage went down
-			outputRow.push(`~~${column.base}%~~ ❌ **${column.current}%**`);
+			outputRow.push(`~~${column.base}%~~ **${column.current}%** ❌`);
 		} else if (column.current > column.base) {
 			// coverage went up
-			outputRow.push(`~~${column.base}%~~ ✔️ **${column.current}%**`);
+			outputRow.push(`~~${column.base}%~~ **${column.current}%** ✔️`);
 		} else {
 			// coverage did not change
 			outputRow.push(`${column.base}%`);

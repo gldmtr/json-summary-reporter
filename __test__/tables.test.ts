@@ -38,7 +38,7 @@ describe("Tables", () => {
 			lines: { base: 50, current: 0 },
 			statements: { base: 50, current: 0 },
 		};
-		const expected = `${header} | ~~50%~~ ✔️ **100%** | ~~50%~~ ✔️ **100%** | ~~50%~~ ❌ **0%** | ~~50%~~ ❌ **0%**`;
+		const expected = `${header} | ~~50%~~ **100%** ✔️ | ~~50%~~ **100%** ✔️ | ~~50%~~ **0%** ❌ | ~~50%~~ **0%** ❌`;
 
 		const actual = getTableRow(header, data);
 		expect(actual).toEqual(expected);
@@ -71,7 +71,7 @@ describe("Tables", () => {
 		const expected = [
 			"File | Branches | Functions | Lines | Statements",
 			"---|---|---|---|---",
-			"singleFile | ~~50%~~ ❌ **0%** | ~~50%~~ ✔️ **100%** | 50% | 50%",
+			"singleFile | ~~50%~~ **0%** ❌ | ~~50%~~ **100%** ✔️ | 50% | 50%",
 		];
 
 		const actual = getComparisonTableLines(data);
@@ -140,7 +140,7 @@ describe("Tables", () => {
 			"",
 			"File | Branches | Functions | Lines | Statements",
 			"---|---|---|---|---",
-			"Summary | ~~1%~~ ✔️ **5%** | ~~2%~~ ✔️ **6%** | ~~3%~~ ✔️ **7%** | ~~4%~~ ✔️ **8%**",
+			"Summary | ~~1%~~ **5%** ✔️ | ~~2%~~ **6%** ✔️ | ~~3%~~ **7%** ✔️ | ~~4%~~ **8%** ✔️",
 			"",
 			"<details>", 
 			`<summary>New Files</summary>`, 
@@ -155,7 +155,7 @@ describe("Tables", () => {
 			"",
 			"File | Branches | Functions | Lines | Statements",
 			"---|---|---|---|---",
-			"changedFile | ~~1%~~ ✔️ **5%** | ~~2%~~ ✔️ **6%** | ~~3%~~ ✔️ **7%** | ~~4%~~ ✔️ **8%**",
+			"changedFile | ~~1%~~ **5%** ✔️ | ~~2%~~ **6%** ✔️ | ~~3%~~ **7%** ✔️ | ~~4%~~ **8%** ✔️",
 			"</details>",
 			"",
 			"<details>", 
