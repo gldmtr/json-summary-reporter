@@ -33,7 +33,7 @@ jobs:
         uses: ./ # Uses an action in the root directory
         with:
           base-coverage-file: base-coverage.json
-          current-coverage-file: coverage-summary.json
+          current-coverage-file: coverage/coverage-summary.json
           app-root: /src
           comment-header: "Coverage Comparison"
       
