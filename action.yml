@@ -2,7 +2,7 @@ name: "Coverage Compare"
 description: "Greet someone and record the time"
 inputs:
   github-token:
-    description: "The github token (usually ${{ secrets.GITHUB_TOKEN }})"
+    description: "The github token"
     required: false
     default: ${{ github.token }}
   base-coverage-file:
