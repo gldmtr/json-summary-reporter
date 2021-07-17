@@ -78,6 +78,33 @@ describe("Tables", () => {
 		expect(actual).toEqual(expected);
 	});
 
+	test("GIVEN common start points from a file and a snip section is passed in, WHEN getComparisonTable is called, THEN the output is correct", () => {
+		const data: IComparisonSet = {
+			"/annoying/path/src/file.tsx": {
+				branches: { base: 50, current: 0 },
+				functions: { base: 50, current: 100 },
+				lines: { base: 50, current: 50 },
+				statements: { base: 50, current: 50 },
+			},
+			"/annoying/path/src/other.tsx": {
+				branches: { base: 50, current: 0 },
+				functions: { base: 50, current: 100 },
+				lines: { base: 50, current: 50 },
+				statements: { base: 50, current: 50 },
+			},
+		};
+
+		const expected = [
+			"File | Branches | Functions | Lines | Statements",
+			"---|---|---|---|---",
+			"src/file.tsx | ~~50%~~ **0%** ❌ | ~~50%~~ **100%** ✔️ | 50% | 50%",
+			"src/other.tsx | ~~50%~~ **0%** ❌ | ~~50%~~ **100%** ✔️ | 50% | 50%",
+		];
+
+		const actual = getComparisonTableLines(data, "/annoying/path/");
+		expect(actual).toEqual(expected);
+	});
+
 	test("WHEN getSpoilerSection is called, THEN the output is correct", () => {
 		// prettier-ignore
 		const expected = [

@@ -1,5 +1,6 @@
 import { IComparison, IComparisonMetrics, IComparisonSet } from "./comparison";
 import { ICoverageSpec } from "./ICoverageFile";
+import { snip } from "./snip";
 
 export const getTableRow = (header: string, data: IComparisonMetrics): string => {
 	const outputRow = [header];
@@ -27,12 +28,15 @@ export const getTableRow = (header: string, data: IComparisonMetrics): string =>
 	return outputRow.join(" | ");
 };
 
-export const getComparisonTableLines = (data: IComparisonSet): string[] => {
+export const getComparisonTableLines = (data: IComparisonSet, appRootToSnip?: string): string[] => {
 	const outputLines: string[] = [];
 	outputLines.push("File | Branches | Functions | Lines | Statements");
 	outputLines.push("---|---|---|---|---");
-	const lineKey = Object.keys(data);
-	outputLines.push(...lineKey.map((x) => getTableRow(x, data[x])));
+	const lineKeys = Object.keys(data);
+	for (const lineKey of lineKeys) {
+		const header = appRootToSnip ? snip(lineKey, appRootToSnip) : lineKey;
+		outputLines.push(getTableRow(header, data[lineKey]));
+	}
 	return outputLines;
 };
 
@@ -46,26 +50,26 @@ export const getSpoilerSectionLines = (header: string, contentLines: string[]): 
 	return outputLines;
 };
 
-export const getCommentBodyLines = (title: string, data: IComparison): string[] => {
+export const getCommentBodyLines = (title: string, data: IComparison, appRootToSnip?: string): string[] => {
 	const outputLines: string[] = [];
 	outputLines.push(`# ${title}`);
 	outputLines.push("");
 	outputLines.push(...getComparisonTableLines({ Summary: data.summary }));
 	if (Object.keys(data.new).length > 0) {
 		outputLines.push("");
-		outputLines.push(...getSpoilerSectionLines("New Files", getComparisonTableLines(data.new)));
+		outputLines.push(...getSpoilerSectionLines("New Files", getComparisonTableLines(data.new, appRootToSnip)));
 	}
 	if (Object.keys(data.changed).length > 0) {
 		outputLines.push("");
-		outputLines.push(...getSpoilerSectionLines("Changed Files", getComparisonTableLines(data.changed)));
+		outputLines.push(...getSpoilerSectionLines("Changed Files", getComparisonTableLines(data.changed, appRootToSnip)));
 	}
 	if (Object.keys(data.deleted).length > 0) {
 		outputLines.push("");
-		outputLines.push(...getSpoilerSectionLines("Deleted Files", getComparisonTableLines(data.deleted)));
+		outputLines.push(...getSpoilerSectionLines("Deleted Files", getComparisonTableLines(data.deleted, appRootToSnip)));
 	}
 	if (Object.keys(data.unchanged).length > 0) {
 		outputLines.push("");
-		outputLines.push(...getSpoilerSectionLines("Unchanged Files", getComparisonTableLines(data.unchanged)));
+		outputLines.push(...getSpoilerSectionLines("Unchanged Files", getComparisonTableLines(data.unchanged, appRootToSnip)));
 	}
 
 	return outputLines;

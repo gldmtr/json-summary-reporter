@@ -1,5 +1,6 @@
 test-data
 test-output
+junit.xml
 
 .yarn/*
 !.yarn/cache

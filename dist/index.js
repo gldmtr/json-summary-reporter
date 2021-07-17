@@ -6433,7 +6433,16 @@ const writeOutput = (contents, filename) => __awaiter(void 0, void 0, void 0, fu
     yield external_fs_.promises.writeFile(filename, contents, { encoding: "utf8" });
 });
 
+;// CONCATENATED MODULE: ./src/snip.ts
+const snip = (str, partToSnip) => {
+    if (str.startsWith(partToSnip)) {
+        return str.substr(partToSnip.length);
+    }
+    return str;
+};
+
 ;// CONCATENATED MODULE: ./src/tables.ts
+
 const getTableRow = (header, data) => {
     const outputRow = [header];
     const keys = ["branches", "functions", "lines", "statements"];
@@ -6462,12 +6471,15 @@ const getTableRow = (header, data) => {
     }
     return outputRow.join(" | ");
 };
-const getComparisonTableLines = (data) => {
+const getComparisonTableLines = (data, appRootToSnip) => {
     const outputLines = [];
     outputLines.push("File | Branches | Functions | Lines | Statements");
     outputLines.push("---|---|---|---|---");
-    const lineKey = Object.keys(data);
-    outputLines.push(...lineKey.map((x) => getTableRow(x, data[x])));
+    const lineKeys = Object.keys(data);
+    for (const lineKey of lineKeys) {
+        const header = appRootToSnip ? snip(lineKey, appRootToSnip) : lineKey;
+        outputLines.push(getTableRow(header, data[lineKey]));
+    }
     return outputLines;
 };
 const getSpoilerSectionLines = (header, contentLines) => {
@@ -6479,26 +6491,26 @@ const getSpoilerSectionLines = (header, contentLines) => {
     outputLines.push("</details>");
     return outputLines;
 };
-const getCommentBodyLines = (title, data) => {
+const getCommentBodyLines = (title, data, appRootToSnip) => {
     const outputLines = [];
     outputLines.push(`# ${title}`);
     outputLines.push("");
     outputLines.push(...getComparisonTableLines({ Summary: data.summary }));
     if (Object.keys(data.new).length > 0) {
         outputLines.push("");
-        outputLines.push(...getSpoilerSectionLines("New Files", getComparisonTableLines(data.new)));
+        outputLines.push(...getSpoilerSectionLines("New Files", getComparisonTableLines(data.new, appRootToSnip)));
     }
     if (Object.keys(data.changed).length > 0) {
         outputLines.push("");
-        outputLines.push(...getSpoilerSectionLines("Changed Files", getComparisonTableLines(data.changed)));
+        outputLines.push(...getSpoilerSectionLines("Changed Files", getComparisonTableLines(data.changed, appRootToSnip)));
     }
     if (Object.keys(data.deleted).length > 0) {
         outputLines.push("");
-        outputLines.push(...getSpoilerSectionLines("Deleted Files", getComparisonTableLines(data.deleted)));
+        outputLines.push(...getSpoilerSectionLines("Deleted Files", getComparisonTableLines(data.deleted, appRootToSnip)));
     }
     if (Object.keys(data.unchanged).length > 0) {
         outputLines.push("");
-        outputLines.push(...getSpoilerSectionLines("Unchanged Files", getComparisonTableLines(data.unchanged)));
+        outputLines.push(...getSpoilerSectionLines("Unchanged Files", getComparisonTableLines(data.unchanged, appRootToSnip)));
     }
     return outputLines;
 };
@@ -6523,7 +6535,8 @@ const main = () => main_awaiter(void 0, void 0, void 0, function* () {
     const baseCoverageFile = (0,core.getInput)("base-coverage-file", { required: true });
     const currentCoverageFile = (0,core.getInput)("current-coverage-file", { required: true });
     const commentHeader = (0,core.getInput)("comment-header");
-    const commentText = yield getComparisonComment(baseCoverageFile, currentCoverageFile, commentHeader);
+    const appRootCommon = (0,core.getInput)("app-root");
+    const commentText = yield getComparisonComment(baseCoverageFile, currentCoverageFile, commentHeader, appRootCommon);
     const token = (0,core.getInput)("github-token", { required: true });
     const github = (0,lib_github.getOctokit)(token);
     const allComments = yield github.rest.issues.listComments({
@@ -6552,12 +6565,11 @@ const main = () => main_awaiter(void 0, void 0, void 0, function* () {
             body: commentText,
         });
     }
-    console.log(JSON.stringify(allComments));
 });
-const getComparisonComment = (baseCoverageFile, currentCoverageFile, commentHeader) => main_awaiter(void 0, void 0, void 0, function* () {
+const getComparisonComment = (baseCoverageFile, currentCoverageFile, commentHeader, appRoot) => main_awaiter(void 0, void 0, void 0, function* () {
     const { base, current } = yield getCoverageFiles(baseCoverageFile, currentCoverageFile);
     const comparison = getComparison(base, current);
-    const outputLines = getCommentBodyLines(commentHeader, comparison);
+    const outputLines = getCommentBodyLines(commentHeader, comparison, appRoot);
     return outputLines.join("\r\n");
 });
 const debugMain = () => main_awaiter(void 0, void 0, void 0, function* () {

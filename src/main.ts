@@ -10,7 +10,8 @@ const main = async () => {
 	const baseCoverageFile = getInput("base-coverage-file", { required: true });
 	const currentCoverageFile = getInput("current-coverage-file", { required: true });
 	const commentHeader = getInput("comment-header");
-	const commentText = await getComparisonComment(baseCoverageFile, currentCoverageFile, commentHeader);
+	const appRootCommon = getInput("app-root");
+	const commentText = await getComparisonComment(baseCoverageFile, currentCoverageFile, commentHeader, appRootCommon);
 	const token = getInput("github-token", { required: true });
 	const github = getOctokit(token);
 
@@ -41,14 +42,12 @@ const main = async () => {
 			body: commentText,
 		});
 	}
-
-	console.log(JSON.stringify(allComments));
 };
 
-export const getComparisonComment = async (baseCoverageFile: string, currentCoverageFile: string, commentHeader: string): Promise<string> => {
+export const getComparisonComment = async (baseCoverageFile: string, currentCoverageFile: string, commentHeader: string, appRoot?: string): Promise<string> => {
 	const { base, current } = await getCoverageFiles(baseCoverageFile, currentCoverageFile);
 	const comparison = getComparison(base, current);
-	const outputLines = getCommentBodyLines(commentHeader, comparison);
+	const outputLines = getCommentBodyLines(commentHeader, comparison, appRoot);
 	return outputLines.join("\r\n");
 };
 
