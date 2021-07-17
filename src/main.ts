@@ -4,6 +4,8 @@ import { getComparison } from "./comparison";
 import { getCoverageFiles, writeOutput } from "./fileIo";
 import { getCommentBodyLines } from "./tables";
 
+const githubActionsBotId = 41898282;
+
 const main = async () => {
 	const baseCoverageFile = getInput("base-coverage-file", { required: true });
 	const currentCoverageFile = getInput("current-coverage-file", { required: true });
@@ -12,18 +14,33 @@ const main = async () => {
 	const token = getInput("github-token", { required: true });
 	const github = getOctokit(token);
 
-	await github.rest.issues.createComment({
-		owner: context.repo.owner,
-		repo: context.repo.repo,
-		issue_number: context.payload.pull_request.number,
-		body: commentText,
-	});
-
 	const allComments = await github.rest.issues.listComments({
 		owner: context.repo.owner,
 		repo: context.repo.repo,
 		issue_number: context.payload.pull_request.number,
 	});
+
+	const existingCommentIds = allComments.data
+		.filter((x) => x.user.id === githubActionsBotId)
+		.filter((x) => x.body.startsWith(`# ${commentHeader}`))
+		.map((x) => x.id);
+
+	if (existingCommentIds.length > 0) {
+		await github.rest.issues.updateComment({
+			comment_id: existingCommentIds[0],
+			owner: context.repo.owner,
+			repo: context.repo.repo,
+			issue_number: context.payload.pull_request.number,
+			body: commentText,
+		});
+	} else {
+		await github.rest.issues.createComment({
+			owner: context.repo.owner,
+			repo: context.repo.repo,
+			issue_number: context.payload.pull_request.number,
+			body: commentText,
+		});
+	}
 
 	console.log(JSON.stringify(allComments));
 };
