@@ -57,7 +57,7 @@ const main = async () => {
 	}
 };
 
-const hasComparisonChanged = (comparison: IComparison): boolean => {
+export const hasComparisonChanged = (comparison: IComparison): boolean => {
 	if (
 		Object.keys(comparison.changed).length > 0 ||
 		Object.keys(comparison.deleted).length > 0 ||
