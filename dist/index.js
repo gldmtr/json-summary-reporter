@@ -6518,6 +6518,7 @@ var main_awaiter = (undefined && undefined.__awaiter) || function (thisArg, _arg
 
 
 
+const githubActionsBotId = 41898282;
 const main = () => main_awaiter(void 0, void 0, void 0, function* () {
     const baseCoverageFile = (0,core.getInput)("base-coverage-file", { required: true });
     const currentCoverageFile = (0,core.getInput)("current-coverage-file", { required: true });
@@ -6525,17 +6526,32 @@ const main = () => main_awaiter(void 0, void 0, void 0, function* () {
     const commentText = yield getComparisonComment(baseCoverageFile, currentCoverageFile, commentHeader);
     const token = (0,core.getInput)("github-token", { required: true });
     const github = (0,lib_github.getOctokit)(token);
-    yield github.rest.issues.createComment({
-        owner: lib_github.context.repo.owner,
-        repo: lib_github.context.repo.repo,
-        issue_number: lib_github.context.payload.pull_request.number,
-        body: commentText,
-    });
     const allComments = yield github.rest.issues.listComments({
         owner: lib_github.context.repo.owner,
         repo: lib_github.context.repo.repo,
         issue_number: lib_github.context.payload.pull_request.number,
     });
+    const existingCommentIds = allComments.data
+        .filter((x) => x.user.id === githubActionsBotId)
+        .filter((x) => x.body.startsWith(`# ${commentHeader}`))
+        .map((x) => x.id);
+    if (existingCommentIds.length > 0) {
+        yield github.rest.issues.updateComment({
+            comment_id: existingCommentIds[0],
+            owner: lib_github.context.repo.owner,
+            repo: lib_github.context.repo.repo,
+            issue_number: lib_github.context.payload.pull_request.number,
+            body: commentText,
+        });
+    }
+    else {
+        yield github.rest.issues.createComment({
+            owner: lib_github.context.repo.owner,
+            repo: lib_github.context.repo.repo,
+            issue_number: lib_github.context.payload.pull_request.number,
+            body: commentText,
+        });
+    }
     console.log(JSON.stringify(allComments));
 });
 const getComparisonComment = (baseCoverageFile, currentCoverageFile, commentHeader) => main_awaiter(void 0, void 0, void 0, function* () {
