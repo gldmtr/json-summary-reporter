@@ -1,0 +1,18 @@
+on: [push]
+
+jobs:
+  hello_world_job:
+    runs-on: ubuntu-latest
+    name: Test it out on PRs
+    steps:
+      # To use this repository's private action,
+      # you must check out the repository
+      - name: Checkout
+        uses: actions/checkout@v2
+      - name: Hello world action step
+        uses: ./ # Uses an action in the root directory
+        with:
+          base-coverage-file: base-coverage.json
+          current-coverage-file: base-coverage.json
+          app-root: /src
+          comment-header: "Coverage Comparison Yay!"

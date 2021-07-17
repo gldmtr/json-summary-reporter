@@ -11,11 +11,21 @@ const main = async () => {
 	const commentText = await getComparisonComment(baseCoverageFile, currentCoverageFile, commentHeader);
 	const token = getInput("github-token", { required: true });
 	const github = getOctokit(token);
+
+	await github.rest.issues.createComment({
+		owner: context.repo.owner,
+		repo: context.repo.repo,
+		issue_number: context.payload.pull_request.number,
+		body: commentText,
+	});
+
 	const allComments = await github.rest.issues.listComments({
 		owner: context.repo.owner,
 		repo: context.repo.repo,
 		issue_number: context.payload.pull_request.number,
 	});
+
+	console.log(JSON.stringify(allComments));
 };
 
 export const getComparisonComment = async (baseCoverageFile: string, currentCoverageFile: string, commentHeader: string): Promise<string> => {
