@@ -1,12 +1,13 @@
+name: Continuous Integration
+
 on: 
   push:
     branches: [main]
 
-
 jobs:
   build:
     runs-on: ubuntu-latest
-    name: Test it out on PRs
+    name: Build and test
     steps:
       # To use this repository's private action,
       # you must check out the repository
@@ -39,16 +40,8 @@ jobs:
         run: |
           rm base-coverage.json
           mv coverage/coverage-summary.json base-coverage.json
-
-      - uses: EndBug/add-and-commit@v7 # You can change this to use a specific version
-        with:
-          # The arguments for the `git add` command (see the paragraph below for more info)
-          # Default: '.'
-          add: 'base-coverage.json dist/**/*'
-          default_author: github_actions
-
-          # The message for the commit
-          # Default: 'Commit from GitHub Actions (name of the workflow)'
-          message: 'Build and update coverage'
-
       
+      - name: Create Pull Request
+        uses: peter-evans/create-pull-request@v3.10.0
+        with:
+          delete-branch: true
