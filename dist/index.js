@@ -6575,7 +6575,13 @@ const main = () => main_awaiter(void 0, void 0, void 0, function* () {
     }
 });
 const hasComparisonChanged = (comparison) => {
-    if (Object.keys(comparison.changed).length > 0 || Object.keys(comparison.deleted).length > 0 || Object.keys(comparison.new).length > 0) {
+    if (Object.keys(comparison.changed).length > 0 ||
+        Object.keys(comparison.deleted).length > 0 ||
+        Object.keys(comparison.new).length > 0 ||
+        comparison.summary.branches.base != comparison.summary.branches.current ||
+        comparison.summary.functions.base != comparison.summary.functions.current ||
+        comparison.summary.lines.base != comparison.summary.lines.current ||
+        comparison.summary.statements.base != comparison.summary.statements.current) {
         return true;
     }
     return false;
