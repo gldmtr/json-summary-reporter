@@ -6536,6 +6536,7 @@ const main = () => main_awaiter(void 0, void 0, void 0, function* () {
     const currentCoverageFile = (0,core.getInput)("current-coverage-file", { required: true });
     const commentHeader = (0,core.getInput)("comment-header");
     const appRootCommon = (0,core.getInput)("app-root");
+    console.log(lib_github.context);
     const commentText = yield getComparisonComment(baseCoverageFile, currentCoverageFile, commentHeader, appRootCommon);
     const token = (0,core.getInput)("github-token", { required: true });
     const github = (0,lib_github.getOctokit)(token);

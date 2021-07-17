@@ -11,6 +11,7 @@ const main = async () => {
 	const currentCoverageFile = getInput("current-coverage-file", { required: true });
 	const commentHeader = getInput("comment-header");
 	const appRootCommon = getInput("app-root");
+	console.log(context);
 	const commentText = await getComparisonComment(baseCoverageFile, currentCoverageFile, commentHeader, appRootCommon);
 	const token = getInput("github-token", { required: true });
 	const github = getOctokit(token);
