@@ -12,4 +12,5 @@ This is a GitHub action that will comment on a PR with the change in test covera
 	  current-coverage-file: coverage/coverage-summary.json
 	  app-root: "/remove/annoying/directory/structure/to/make/files/more/readable" # optional, relative to the workspace root.
 	  comment-header: "Coverage Comparison for my special app" # optional - defaults to "Coverage Comparison"
+	  comment-on-no-changes: false #optional, defaults to false. If true, will always leave a PR comment, even if there are no coverage changes
 ```

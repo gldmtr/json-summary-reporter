@@ -6328,6 +6328,8 @@ __nccwpck_require__.d(__webpack_exports__, {
 var core = __nccwpck_require__(766);
 // EXTERNAL MODULE: ./.yarn/cache/@actions-github-npm-5.0.0-903c87c756-29e7de0435.zip/node_modules/@actions/github/lib/github.js
 var lib_github = __nccwpck_require__(290);
+// EXTERNAL MODULE: external "path"
+var external_path_ = __nccwpck_require__(622);
 ;// CONCATENATED MODULE: ./src/comparison.ts
 const getMetrics = (base, current) => {
     const keys = ["branches", "functions", "lines", "statements"];
@@ -6433,8 +6435,6 @@ const writeOutput = (contents, filename) => __awaiter(void 0, void 0, void 0, fu
     yield external_fs_.promises.writeFile(filename, contents, { encoding: "utf8" });
 });
 
-// EXTERNAL MODULE: external "path"
-var external_path_ = __nccwpck_require__(622);
 ;// CONCATENATED MODULE: ./src/tables.ts
 
 const getTableRow = (header, data) => {
@@ -6531,7 +6531,8 @@ const main = () => main_awaiter(void 0, void 0, void 0, function* () {
     const currentCoverageFile = (0,core.getInput)("current-coverage-file", { required: true });
     const commentHeader = (0,core.getInput)("comment-header");
     const appRootCommon = (0,external_path_.normalize)((0,external_path_.join)(process.env.GITHUB_WORKSPACE, (0,core.getInput)("app-root")));
-    const commentText = yield getComparisonComment(baseCoverageFile, currentCoverageFile, commentHeader, appRootCommon);
+    const commentOnNoChanges = (0,core.getBooleanInput)("comment-on-no-changes");
+    const commentText = yield getComparisonComment(baseCoverageFile, currentCoverageFile, commentHeader, appRootCommon, commentOnNoChanges);
     const token = (0,core.getInput)("github-token", { required: true });
     const github = (0,lib_github.getOctokit)(token);
     const allComments = yield github.rest.issues.listComments({
@@ -6544,28 +6545,51 @@ const main = () => main_awaiter(void 0, void 0, void 0, function* () {
         .filter((x) => x.body.startsWith(`# ${commentHeader}`))
         .map((x) => x.id);
     if (existingCommentIds.length > 0) {
-        yield github.rest.issues.updateComment({
-            comment_id: existingCommentIds[0],
-            owner: lib_github.context.repo.owner,
-            repo: lib_github.context.repo.repo,
-            issue_number: lib_github.context.payload.pull_request.number,
-            body: commentText,
-        });
+        if (commentText) {
+            yield github.rest.issues.updateComment({
+                comment_id: existingCommentIds[0],
+                owner: lib_github.context.repo.owner,
+                repo: lib_github.context.repo.repo,
+                issue_number: lib_github.context.payload.pull_request.number,
+                body: commentText,
+            });
+        }
+        else {
+            yield github.rest.issues.deleteComment({
+                comment_id: existingCommentIds[0],
+                owner: lib_github.context.repo.owner,
+                repo: lib_github.context.repo.repo,
+                issue_number: lib_github.context.payload.pull_request.number,
+            });
+        }
     }
     else {
-        yield github.rest.issues.createComment({
-            owner: lib_github.context.repo.owner,
-            repo: lib_github.context.repo.repo,
-            issue_number: lib_github.context.payload.pull_request.number,
-            body: commentText,
-        });
+        if (commentText) {
+            yield github.rest.issues.createComment({
+                owner: lib_github.context.repo.owner,
+                repo: lib_github.context.repo.repo,
+                issue_number: lib_github.context.payload.pull_request.number,
+                body: commentText,
+            });
+        }
     }
 });
-const getComparisonComment = (baseCoverageFile, currentCoverageFile, commentHeader, appRoot) => main_awaiter(void 0, void 0, void 0, function* () {
+const hasComparisonChanged = (comparison) => {
+    if (Object.keys(comparison.changed).length > 0 || Object.keys(comparison.deleted).length > 0 || Object.keys(comparison.new).length > 0) {
+        return true;
+    }
+    return false;
+};
+const getComparisonComment = (baseCoverageFile, currentCoverageFile, commentHeader, appRoot, commentOnNoChanges) => main_awaiter(void 0, void 0, void 0, function* () {
     const { base, current } = yield getCoverageFiles(baseCoverageFile, currentCoverageFile);
     const comparison = getComparison(base, current);
-    const outputLines = getCommentBodyLines(commentHeader, comparison, appRoot);
-    return outputLines.join("\r\n");
+    if (hasComparisonChanged(comparison) || commentOnNoChanges) {
+        const outputLines = getCommentBodyLines(commentHeader, comparison, appRoot);
+        return outputLines.join("\r\n");
+    }
+    else {
+        return null;
+    }
 });
 const debugMain = () => main_awaiter(void 0, void 0, void 0, function* () {
     const commentText = yield getComparisonComment("test-data/base-coverage.json", "test-data/new-coverage.json", "My Lovely Header", "/workspaces/srw-ui/main/directory");

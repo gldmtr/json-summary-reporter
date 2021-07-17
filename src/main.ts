@@ -1,9 +1,9 @@
-import { getInput } from "@actions/core";
+import { getBooleanInput, getInput } from "@actions/core";
 import { context, getOctokit } from "@actions/github";
-import { getComparison } from "./comparison";
+import { join, normalize } from "path";
+import { getComparison, IComparison } from "./comparison";
 import { getCoverageFiles, writeOutput } from "./fileIo";
 import { getCommentBodyLines } from "./tables";
-import { join, normalize } from "path";
 
 const githubActionsBotId = 41898282;
 
@@ -12,7 +12,8 @@ const main = async () => {
 	const currentCoverageFile = getInput("current-coverage-file", { required: true });
 	const commentHeader = getInput("comment-header");
 	const appRootCommon = normalize(join(process.env.GITHUB_WORKSPACE, getInput("app-root")));
-	const commentText = await getComparisonComment(baseCoverageFile, currentCoverageFile, commentHeader, appRootCommon);
+	const commentOnNoChanges = getBooleanInput("comment-on-no-changes");
+	const commentText = await getComparisonComment(baseCoverageFile, currentCoverageFile, commentHeader, appRootCommon, commentOnNoChanges);
 	const token = getInput("github-token", { required: true });
 	const github = getOctokit(token);
 
@@ -28,28 +29,56 @@ const main = async () => {
 		.map((x) => x.id);
 
 	if (existingCommentIds.length > 0) {
-		await github.rest.issues.updateComment({
-			comment_id: existingCommentIds[0],
-			owner: context.repo.owner,
-			repo: context.repo.repo,
-			issue_number: context.payload.pull_request.number,
-			body: commentText,
-		});
+		if (commentText) {
+			await github.rest.issues.updateComment({
+				comment_id: existingCommentIds[0],
+				owner: context.repo.owner,
+				repo: context.repo.repo,
+				issue_number: context.payload.pull_request.number,
+				body: commentText,
+			});
+		} else {
+			await github.rest.issues.deleteComment({
+				comment_id: existingCommentIds[0],
+				owner: context.repo.owner,
+				repo: context.repo.repo,
+				issue_number: context.payload.pull_request.number,
+			});
+		}
 	} else {
-		await github.rest.issues.createComment({
-			owner: context.repo.owner,
-			repo: context.repo.repo,
-			issue_number: context.payload.pull_request.number,
-			body: commentText,
-		});
+		if (commentText) {
+			await github.rest.issues.createComment({
+				owner: context.repo.owner,
+				repo: context.repo.repo,
+				issue_number: context.payload.pull_request.number,
+				body: commentText,
+			});
+		}
 	}
 };
 
-export const getComparisonComment = async (baseCoverageFile: string, currentCoverageFile: string, commentHeader: string, appRoot?: string): Promise<string> => {
+const hasComparisonChanged = (comparison: IComparison): boolean => {
+	if (Object.keys(comparison.changed).length > 0 || Object.keys(comparison.deleted).length > 0 || Object.keys(comparison.new).length > 0) {
+		return true;
+	}
+	return false;
+};
+
+export const getComparisonComment = async (
+	baseCoverageFile: string,
+	currentCoverageFile: string,
+	commentHeader: string,
+	appRoot?: string,
+	commentOnNoChanges?: boolean
+): Promise<string | null> => {
 	const { base, current } = await getCoverageFiles(baseCoverageFile, currentCoverageFile);
 	const comparison = getComparison(base, current);
-	const outputLines = getCommentBodyLines(commentHeader, comparison, appRoot);
-	return outputLines.join("\r\n");
+	if (hasComparisonChanged(comparison) || commentOnNoChanges) {
+		const outputLines = getCommentBodyLines(commentHeader, comparison, appRoot);
+		return outputLines.join("\r\n");
+	} else {
+		return null;
+	}
 };
 
 const debugMain = async () => {
