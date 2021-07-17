@@ -1,6 +1,6 @@
+import { relative } from "path";
 import { IComparison, IComparisonMetrics, IComparisonSet } from "./comparison";
 import { ICoverageSpec } from "./ICoverageFile";
-import { snip } from "./snip";
 
 export const getTableRow = (header: string, data: IComparisonMetrics): string => {
 	const outputRow = [header];
@@ -34,7 +34,7 @@ export const getComparisonTableLines = (data: IComparisonSet, appRootToSnip?: st
 	outputLines.push("---|---|---|---|---");
 	const lineKeys = Object.keys(data);
 	for (const lineKey of lineKeys) {
-		const header = appRootToSnip ? snip(lineKey, appRootToSnip) : lineKey;
+		const header = appRootToSnip ? relative(appRootToSnip, lineKey) : lineKey;
 		outputLines.push(getTableRow(header, data[lineKey]));
 	}
 	return outputLines;

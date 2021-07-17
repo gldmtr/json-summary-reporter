@@ -3,6 +3,7 @@ import { context, getOctokit } from "@actions/github";
 import { getComparison } from "./comparison";
 import { getCoverageFiles, writeOutput } from "./fileIo";
 import { getCommentBodyLines } from "./tables";
+import { join, normalize } from "path";
 
 const githubActionsBotId = 41898282;
 
@@ -10,8 +11,7 @@ const main = async () => {
 	const baseCoverageFile = getInput("base-coverage-file", { required: true });
 	const currentCoverageFile = getInput("current-coverage-file", { required: true });
 	const commentHeader = getInput("comment-header");
-	const appRootCommon = getInput("app-root");
-	console.log(context);
+	const appRootCommon = normalize(join(process.env.GITHUB_WORKSPACE, getInput("app-root")));
 	const commentText = await getComparisonComment(baseCoverageFile, currentCoverageFile, commentHeader, appRootCommon);
 	const token = getInput("github-token", { required: true });
 	const github = getOctokit(token);
@@ -53,7 +53,12 @@ export const getComparisonComment = async (baseCoverageFile: string, currentCove
 };
 
 const debugMain = async () => {
-	const commentText = await getComparisonComment("test-data/base-coverage.json", "test-data/new-coverage.json", "My Lovely Header");
+	const commentText = await getComparisonComment(
+		"test-data/base-coverage.json",
+		"test-data/new-coverage.json",
+		"My Lovely Header",
+		"/workspaces/srw-ui/main/directory"
+	);
 	await writeOutput(commentText, "./test-output/output.md");
 };
 

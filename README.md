@@ -10,6 +10,6 @@ This is a GitHub action that will comment on a PR with the change in test covera
 	with:
 	  base-coverage-file: base-coverage.json
 	  current-coverage-file: coverage/coverage-summary.json
-	  app-root: "/remove/annoying/directory/structure/to/make/files/more/readable" # optional
+	  app-root: "/remove/annoying/directory/structure/to/make/files/more/readable" # optional, relative to the workspace root.
 	  comment-header: "Coverage Comparison for my special app" # optional - defaults to "Coverage Comparison"
 ```

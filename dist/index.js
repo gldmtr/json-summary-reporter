@@ -6433,14 +6433,8 @@ const writeOutput = (contents, filename) => __awaiter(void 0, void 0, void 0, fu
     yield external_fs_.promises.writeFile(filename, contents, { encoding: "utf8" });
 });
 
-;// CONCATENATED MODULE: ./src/snip.ts
-const snip = (str, partToSnip) => {
-    if (str.startsWith(partToSnip)) {
-        return str.substr(partToSnip.length);
-    }
-    return str;
-};
-
+// EXTERNAL MODULE: external "path"
+var external_path_ = __nccwpck_require__(622);
 ;// CONCATENATED MODULE: ./src/tables.ts
 
 const getTableRow = (header, data) => {
@@ -6477,7 +6471,7 @@ const getComparisonTableLines = (data, appRootToSnip) => {
     outputLines.push("---|---|---|---|---");
     const lineKeys = Object.keys(data);
     for (const lineKey of lineKeys) {
-        const header = appRootToSnip ? snip(lineKey, appRootToSnip) : lineKey;
+        const header = appRootToSnip ? (0,external_path_.relative)(appRootToSnip, lineKey) : lineKey;
         outputLines.push(getTableRow(header, data[lineKey]));
     }
     return outputLines;
@@ -6530,13 +6524,13 @@ var main_awaiter = (undefined && undefined.__awaiter) || function (thisArg, _arg
 
 
 
+
 const githubActionsBotId = 41898282;
 const main = () => main_awaiter(void 0, void 0, void 0, function* () {
     const baseCoverageFile = (0,core.getInput)("base-coverage-file", { required: true });
     const currentCoverageFile = (0,core.getInput)("current-coverage-file", { required: true });
     const commentHeader = (0,core.getInput)("comment-header");
-    const appRootCommon = (0,core.getInput)("app-root");
-    console.log(lib_github.context);
+    const appRootCommon = (0,external_path_.normalize)((0,external_path_.join)(process.env.GITHUB_WORKSPACE, (0,core.getInput)("app-root")));
     const commentText = yield getComparisonComment(baseCoverageFile, currentCoverageFile, commentHeader, appRootCommon);
     const token = (0,core.getInput)("github-token", { required: true });
     const github = (0,lib_github.getOctokit)(token);
@@ -6574,7 +6568,7 @@ const getComparisonComment = (baseCoverageFile, currentCoverageFile, commentHead
     return outputLines.join("\r\n");
 });
 const debugMain = () => main_awaiter(void 0, void 0, void 0, function* () {
-    const commentText = yield getComparisonComment("test-data/base-coverage.json", "test-data/new-coverage.json", "My Lovely Header");
+    const commentText = yield getComparisonComment("test-data/base-coverage.json", "test-data/new-coverage.json", "My Lovely Header", "/workspaces/srw-ui/main/directory");
     yield writeOutput(commentText, "./test-output/output.md");
 });
 if (process.env.NODE_ENV === "DEBUG") {
