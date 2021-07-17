@@ -40,5 +40,8 @@ const debugMain = async () => {
 	await writeOutput(commentText, "./test-output/output.md");
 };
 
-//main();
-debugMain();
+if (process.env.NODE_ENV === "DEBUG") {
+	debugMain();
+} else {
+	main();
+}

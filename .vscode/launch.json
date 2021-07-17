@@ -6,7 +6,9 @@
 			"request": "launch",
 			"runtimeExecutable": "yarn",
 			"runtimeArgs": ["start"],
-	  
+			"env": {
+				"NODE_ENV": "DEBUG"
+			},
 			"args": ["src/main.ts"],
 			
 			"cwd": "${workspaceRoot}",

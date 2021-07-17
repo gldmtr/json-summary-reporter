@@ -6327,7 +6327,7 @@ __nccwpck_require__.d(__webpack_exports__, {
 // EXTERNAL MODULE: ./.yarn/cache/@actions-core-npm-1.4.0-82fe1c0286-7319ef629e.zip/node_modules/@actions/core/lib/core.js
 var core = __nccwpck_require__(766);
 // EXTERNAL MODULE: ./.yarn/cache/@actions-github-npm-5.0.0-903c87c756-29e7de0435.zip/node_modules/@actions/github/lib/github.js
-var github = __nccwpck_require__(290);
+var lib_github = __nccwpck_require__(290);
 ;// CONCATENATED MODULE: ./src/comparison.ts
 const getMetrics = (base, current) => {
     const keys = ["branches", "functions", "lines", "statements"];
@@ -6519,22 +6519,22 @@ var main_awaiter = (undefined && undefined.__awaiter) || function (thisArg, _arg
 
 
 const main = () => main_awaiter(void 0, void 0, void 0, function* () {
-    const baseCoverageFile = getInput("base-coverage-file", { required: true });
-    const currentCoverageFile = getInput("current-coverage-file", { required: true });
-    const commentHeader = getInput("comment-header");
+    const baseCoverageFile = (0,core.getInput)("base-coverage-file", { required: true });
+    const currentCoverageFile = (0,core.getInput)("current-coverage-file", { required: true });
+    const commentHeader = (0,core.getInput)("comment-header");
     const commentText = yield getComparisonComment(baseCoverageFile, currentCoverageFile, commentHeader);
-    const token = getInput("github-token", { required: true });
-    const github = getOctokit(token);
+    const token = (0,core.getInput)("github-token", { required: true });
+    const github = (0,lib_github.getOctokit)(token);
     yield github.rest.issues.createComment({
-        owner: context.repo.owner,
-        repo: context.repo.repo,
-        issue_number: context.payload.pull_request.number,
+        owner: lib_github.context.repo.owner,
+        repo: lib_github.context.repo.repo,
+        issue_number: lib_github.context.payload.pull_request.number,
         body: commentText,
     });
     const allComments = yield github.rest.issues.listComments({
-        owner: context.repo.owner,
-        repo: context.repo.repo,
-        issue_number: context.payload.pull_request.number,
+        owner: lib_github.context.repo.owner,
+        repo: lib_github.context.repo.repo,
+        issue_number: lib_github.context.payload.pull_request.number,
     });
     console.log(JSON.stringify(allComments));
 });
@@ -6548,8 +6548,12 @@ const debugMain = () => main_awaiter(void 0, void 0, void 0, function* () {
     const commentText = yield getComparisonComment("test-data/base-coverage.json", "test-data/new-coverage.json", "My Lovely Header");
     yield writeOutput(commentText, "./test-output/output.md");
 });
-//main();
-debugMain();
+if (process.env.NODE_ENV === "DEBUG") {
+    debugMain();
+}
+else {
+    main();
+}
 
 })();
 
