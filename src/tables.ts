@@ -1,98 +1,72 @@
-import { ICoverageFile } from "./ICoverageFile";
+import { IComparison, IComparisonMetrics, IComparisonSet } from "./comparison";
+import { ICoverageSpec } from "./ICoverageFile";
 
-interface IOutputRow {
-	0: string;
-	1: string;
-	2: string;
-	3: string;
-	4: string;
-}
+export const getTableRow = (header: string, data: IComparisonMetrics): string => {
+	const outputRow = [header];
+	const keys: (keyof ICoverageSpec)[] = ["branches", "functions", "lines", "statements"];
 
-const getTableRow = (header: string, baseValues: number[] | null[], comparisonValues: number[] | null[]): IOutputRow => {
-	const row = [header];
-	for (let i = 0; i < baseValues.length; i++) {
-		const baseValue = baseValues[i];
-		const compValue = comparisonValues[i];
-		if (compValue == null) {
-			row.push(`~~${baseValue}%~~`);
-		} else if (baseValue === null) {
-			row.push(`${compValue}%`);
-		} else if (compValue < baseValue) {
-			row.push(`~~${baseValue}%~~ 📉 **${compValue}%** `);
-		} else if (compValue > baseValue) {
-			row.push(`~~${baseValue}%~~ 📈 **${compValue}%** `);
+	for (const key of keys) {
+		const column = data[key];
+		if (column.current === undefined) {
+			// deleted file
+			outputRow.push(`~~${column.base}%~~`);
+		} else if (column.base === undefined) {
+			// new file
+			outputRow.push(`${column.current}%`);
+		} else if (column.current < column.base) {
+			// coverage went down
+			outputRow.push(`~~${column.base}%~~ ❌ **${column.current}%**`);
+		} else if (column.current > column.base) {
+			// coverage went up
+			outputRow.push(`~~${column.base}%~~ ✔️ **${column.current}%**`);
 		} else {
-			row.push(`${baseValue}%`);
+			// coverage did not change
+			outputRow.push(`${column.base}%`);
 		}
 	}
-	return row.join(' | ');
-}
+	return outputRow.join(" | ");
+};
 
-export const getDetailTable = (base: ICoverageFile, comparison: ICoverageFile, appRoot?: string) => {
-	const files = Object.keys(base)
-		.concat(Object.keys(comparison))
-		.filter((value, index, array) => array.indexOf(value) == index);
+export const getComparisonTableLines = (data: IComparisonSet): string[] => {
+	const outputLines: string[] = [];
+	outputLines.push("File | Branches | Functions | Lines | Statements");
+	outputLines.push("---|---|---|---|---");
+	const lineKey = Object.keys(data);
+	outputLines.push(...lineKey.map((x) => getTableRow(x, data[x])));
+	return outputLines;
+};
 
-	for (const file of files) {
-		let row;
-		let header = file;
-		if (appRoot) {
-			header = header.replace(appRoot, '');
-		}
-		if (base[file] && comparison[file]) {
-			row = getTableRow(
-				header,
-				[base[file].branches.pct, base[file].functions.pct, base[file].lines.pct, base[file].statements.pct],
-				[comparison[file].branches.pct, comparison[file].functions.pct, comparison[file].lines.pct, comparison[file].statements.pct]
-			);
-		} else if (base[file]) {
-			row = getTableRow(
-				header,
-				[base[file].branches.pct, base[file].functions.pct, base[file].lines.pct, base[file].statements.pct],
-				[null, null, null, null]
-			);
-		} else if (comparison[file]) {
-			row = getTableRow(
-				header,
-				[null, null, null, null],
-				[comparison[file].branches.pct, comparison[file].functions.pct, comparison[file].lines.pct, comparison[file].statements.pct]
-			);
-		}
-		output.push(row);
+export const getSpoilerSectionLines = (header: string, contentLines: string[]): string[] => {
+	const outputLines: string[] = [];
+	outputLines.push("<details>");
+	outputLines.push(`<summary>${header}</summary>`);
+	outputLines.push("");
+	outputLines.push(...contentLines);
+	outputLines.push("</details>");
+	return outputLines;
+};
+
+export const getCommentBodyLines = (title: string, data: IComparison): string[] => {
+	const outputLines: string[] = [];
+	outputLines.push(`# ${title}`);
+	outputLines.push("");
+	outputLines.push(...getComparisonTableLines({ Summary: data.summary }));
+	if (Object.keys(data.new).length > 0) {
+		outputLines.push("");
+		outputLines.push(...getSpoilerSectionLines("New Files", getComparisonTableLines(data.new)));
+	}
+	if (Object.keys(data.changed).length > 0) {
+		outputLines.push("");
+		outputLines.push(...getSpoilerSectionLines("Changed Files", getComparisonTableLines(data.changed)));
+	}
+	if (Object.keys(data.deleted).length > 0) {
+		outputLines.push("");
+		outputLines.push(...getSpoilerSectionLines("Deleted Files", getComparisonTableLines(data.deleted)));
+	}
+	if (Object.keys(data.unchanged).length > 0) {
+		outputLines.push("");
+		outputLines.push(...getSpoilerSectionLines("Unchanged Files", getComparisonTableLines(data.changed)));
 	}
 
-	output.push('</details >');
-
-	return output;
-}
-
-export const getSummaryTable = (base: ICoverageFile, comparison: ICoverageFile) => {
-	const output = [];
-	output.push('File | Branches | Functions | Lines | Statements');
-	output.push('---|---|---|---|---');
-
-	let row;
-	const header = "Total";
-	if (base.total && comparison.total) {
-		row = getTableRow(
-			header,
-			[base.total.branches.pct, base.total.functions.pct, base.total.lines.pct, base.total.statements.pct],
-			[comparison.total.branches.pct, comparison.total.functions.pct, comparison.total.lines.pct, comparison.total.statements.pct]
-		);
-	} else if (base.total) {
-		row = getTableRow(
-			header,
-			[base.total.branches.pct, base.total.functions.pct, base.total.lines.pct, base.total.statements.pct],
-			[null, null, null, null]
-		);
-	} else if (comparison.total) {
-		row = getTableRow(
-			header,
-			[null, null, null, null],
-			[comparison.total.branches.pct, comparison.total.functions.pct, comparison.total.lines.pct, comparison.total.statements.pct]
-		);
-	}
-	output.push(row);
-
-	return output;
-}
+	return outputLines;
+};

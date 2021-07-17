@@ -1,19 +1,24 @@
 name: "Coverage Compare"
 description: "Greet someone and record the time"
 inputs:
-  base-coverage:
+  github-token:
+    description: "The github token (usually ${{ secrets.GITHUB_TOKEN }})"
+    required: false
+    default: ${{ github.token }}
+  base-coverage-file:
     description: "Path to Base Coverage file"
     required: true
-  coverage:
-    description: "Path to new Coverage file"
+  current-coverage-file:
+    description: "Path to Current Coverage file"
     required: true
   app-root:
-    description: "The common root path of the files to snip from the filename (optional)"
+    description: "The common root path of the files to snip from the filename (optional, useful for monorepos)"
     required: false
     default: ""
-  app-name:
-    description: "The name of the app to append to the title (optional)"
+  comment-header:
+    description: "The header for the comment (optional, only required if this will be run for multiple comparisons in a single PR)"
     required: false
+    default: "Coverage Comparison"
 runs:
   using: "node12"
-  main: "src/main.mjs"
+  main: "dist/index.js"

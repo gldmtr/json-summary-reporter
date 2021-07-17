@@ -1,30 +1,34 @@
-import commandLineArgs from 'command-line-args';
-import { ICommandLineArguments, optionDefinitions } from './arguments';
-import { getCoverageFiles, writeOutput } from './fileIo';
-import { getDetailTable, getSummaryTable } from './tables';
-
-const options = commandLineArgs(optionDefinitions) as ICommandLineArguments;
+import { getInput } from "@actions/core";
+import { context, getOctokit } from "@actions/github";
+import { getComparison } from "./comparison";
+import { getCoverageFiles, writeOutput } from "./fileIo";
+import { getCommentBodyLines } from "./tables";
 
 const main = async () => {
-	const { base, comparison } = await getCoverageFiles(options.base, options.output)
+	const baseCoverageFile = getInput("base-coverage-file", { required: true });
+	const currentCoverageFile = getInput("current-coverage-file", { required: true });
+	const commentHeader = getInput("comment-header");
+	const commentText = await getComparisonComment(baseCoverageFile, currentCoverageFile, commentHeader);
+	const token = getInput("github-token", { required: true });
+	const github = getOctokit(token);
+	const allComments = await github.rest.issues.listComments({
+		owner: context.repo.owner,
+		repo: context.repo.repo,
+		issue_number: context.payload.pull_request.number,
+	});
+};
 
-	const output = [];
-	if (options.appName) {
-		output.push(`# Code Coverage Comparison - ${options.appName}`);
-	} else {
-		output.push(`# Code Coverage Comparison`);
-	}
+export const getComparisonComment = async (baseCoverageFile: string, currentCoverageFile: string, commentHeader: string): Promise<string> => {
+	const { base, current } = await getCoverageFiles(baseCoverageFile, currentCoverageFile);
+	const comparison = getComparison(base, current);
+	const outputLines = getCommentBodyLines(commentHeader, comparison);
+	return outputLines.join("\r\n");
+};
 
-	output.push('<details>');
-	output.push('<summary>Full Details</summary>');
-
-	output.push(...getSummaryTable(base, comparison));
-	output.push('', '')
-	output.push('File | Branches | Functions | Lines | Statements');
-	output.push('---|---|---|---|---');
-	output.push(...getDetailTable(base, comparison, options.appRoot));
-	output.push('', '');
-	await writeOutput(output.join('\r\n'), options.output);
-}
+const debugMain = async () => {
+	const commentText = await getComparisonComment("test-data/base-coverage.json", "test-data/new-coverage.json", "My Lovely Header");
+	await writeOutput(commentText, "./test-output/output.md");
+};
 
 main();
+//debugMain();
