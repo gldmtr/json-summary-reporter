@@ -6321,7 +6321,8 @@ __nccwpck_require__.r(__webpack_exports__);
 
 // EXPORTS
 __nccwpck_require__.d(__webpack_exports__, {
-  "getComparisonComment": () => (/* binding */ getComparisonComment)
+  "getComparisonComment": () => (/* binding */ getComparisonComment),
+  "hasComparisonChanged": () => (/* binding */ hasComparisonChanged)
 });
 
 // EXTERNAL MODULE: ./.yarn/cache/@actions-core-npm-1.4.0-82fe1c0286-7319ef629e.zip/node_modules/@actions/core/lib/core.js
