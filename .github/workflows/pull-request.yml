@@ -1,9 +1,11 @@
+name: Pull Request
+
 on: [pull_request]
 
 jobs:
   build:
     runs-on: ubuntu-latest
-    name: Test it out on PRs
+    name: Pull Request
     steps:
       # To use this repository's private action,
       # you must check out the repository
