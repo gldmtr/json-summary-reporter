@@ -9,8 +9,9 @@
   "scripts": {
     "lint": "eslint src --ext .ts",
     "test": "jest",
-    "test:ci": "jest --config=./jest.config.js --collectCoverage",
-    "build": "ncc build src/main.ts"
+    "test:ci": "jest --config=./jest.config.js --collectCoverage --ci",
+    "build": "ncc build src/main.ts",
+    "start": "ts-node src/main.ts --nolazy -r ts-node/register/transpile-only"
   },
   "devDependencies": {
     "@babel/core": "^7.14.6",
@@ -23,7 +24,9 @@
     "babel-jest": "^27.0.6",
     "eslint": "^7.30.0",
     "jest": "^27.0.6",
+    "jest-junit": "^12.2.0",
     "prettier": "2.3.2",
+    "ts-node": "^10.1.0",
     "typescript": "^4.3.5"
   },
   "dependencies": {

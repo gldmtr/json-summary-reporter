@@ -1,0 +1,54 @@
+on: 
+  push:
+    branches: [main]
+
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    name: Test it out on PRs
+    steps:
+      # To use this repository's private action,
+      # you must check out the repository
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: Setup Node
+        uses: actions/setup-node@v2
+        with:
+          node-version: '12'
+
+      - name: Install packages
+        run: yarn install
+
+      - name: Run tests
+        run: yarn test:ci
+
+      - name: Test Reporter
+        if: success() || failure()
+        uses: dorny/test-reporter@v1.5.0
+        with:
+          name: JEST Tests            # Name of the check run which will be created
+          path: junit.xml    # Path to test results
+          reporter: jest-junit        # Format of test results
+
+      - name: Build
+        run: yarn build
+
+      - name: Replace old coverage
+        run: |
+          rm base-coverage.json
+          mv coverage/coverage-summary.json base-coverage.json
+
+      - uses: EndBug/add-and-commit@v7 # You can change this to use a specific version
+        with:
+          # The arguments for the `git add` command (see the paragraph below for more info)
+          # Default: '.'
+          add: 'base-coverage.json dist/**/*'
+          default_author: github_actions
+
+          # The message for the commit
+          # Default: 'Commit from GitHub Actions (name of the workflow)'
+          message: 'Build and update coverage'
+
+      

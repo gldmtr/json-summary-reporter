@@ -1,5 +1,6 @@
 test-data
 test-output
+junit.xml
 
 .yarn/*
 !.yarn/cache
@@ -91,7 +92,7 @@ typings/
 
 # Nuxt.js build / generate output
 .nuxt
-dist
+# dist
 
 # Gatsby files
 .cache/

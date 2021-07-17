@@ -1,0 +1,41 @@
+on: [pull_request]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    name: Test it out on PRs
+    steps:
+      # To use this repository's private action,
+      # you must check out the repository
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: Setup Node
+        uses: actions/setup-node@v2
+        with:
+          node-version: '12'
+
+      - name: Install packages
+        run: yarn install
+
+      - name: Run tests
+        run: yarn test:ci
+
+      - name: Test Reporter
+        if: success() || failure()
+        uses: dorny/test-reporter@v1.5.0
+        with:
+          name: JEST Tests            # Name of the check run which will be created
+          path: junit.xml    # Path to test results
+          reporter: jest-junit        # Format of test results
+
+      - name: Report code coverage change
+        uses: ./ # Uses an action in the root directory
+        with:
+          base-coverage-file: base-coverage.json
+          current-coverage-file: coverage/coverage-summary.json
+          app-root: /src
+          comment-header: "Coverage Comparison"
+      
+      - name: Build
+        run: yarn build

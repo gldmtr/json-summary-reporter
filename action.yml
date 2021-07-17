@@ -2,7 +2,7 @@ name: "Coverage Compare"
 description: "Greet someone and record the time"
 inputs:
   github-token:
-    description: "The github token (usually ${{ secrets.GITHUB_TOKEN }})"
+    description: "The github token"
     required: false
     default: ${{ github.token }}
   base-coverage-file:
@@ -19,6 +19,10 @@ inputs:
     description: "The header for the comment (optional, only required if this will be run for multiple comparisons in a single PR)"
     required: false
     default: "Coverage Comparison"
+  comment-on-no-changes:
+    description: "If true, will always comment, even if there were no changes in coverage (optional, defaults to false)"
+    required: false
+    default: false
 runs:
   using: "node12"
   main: "dist/index.js"

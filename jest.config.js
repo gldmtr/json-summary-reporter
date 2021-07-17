@@ -4,5 +4,6 @@ module.exports = {
 	],
 	"coverageReporters": [
 		"text", "text-summary", "json-summary"
-	]
+	],
+	"reporters": ["default", "jest-junit"]
 }
