@@ -1,0 +1,19 @@
+name: "Coverage Compare"
+description: "Greet someone and record the time"
+inputs:
+  base-coverage:
+    description: "Path to Base Coverage file"
+    required: true
+  coverage:
+    description: "Path to new Coverage file"
+    required: true
+  app-root:
+    description: "The common root path of the files to snip from the filename (optional)"
+    required: false
+    default: ""
+  app-name:
+    description: "The name of the app to append to the title (optional)"
+    required: false
+runs:
+  using: "node12"
+  main: "src/main.mjs"

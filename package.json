@@ -1,0 +1,31 @@
+{
+  "name": "json-summary-reporter",
+  "version": "0.0.1",
+  "description": "A GitHub Action for reporting code coverage from json-summary files",
+  "main": "index.js",
+  "repository": "https://github.com/iKadmium/json-summary-reporter.git",
+  "author": "Jesse Higginson",
+  "license": "MIT",
+  "scripts": {
+    "lint": "eslint",
+    "test": "jest"
+  },
+  "devDependencies": {
+    "@babel/core": "^7.14.6",
+    "@babel/preset-env": "^7.14.7",
+    "@babel/preset-typescript": "^7.14.5",
+    "@types/command-line-args": "^5.0.1",
+    "@types/jest": "^26.0.24",
+    "@types/node": "^16.3.3",
+    "@typescript-eslint/eslint-plugin": "^4.28.3",
+    "@typescript-eslint/parser": "^4.28.3",
+    "babel-jest": "^27.0.6",
+    "eslint": "^7.30.0",
+    "jest": "^27.0.6",
+    "typescript": "^4.3.5"
+  },
+  "dependencies": {
+    "@vercel/ncc": "^0.29.0",
+    "command-line-args": "^5.1.3"
+  }
+}

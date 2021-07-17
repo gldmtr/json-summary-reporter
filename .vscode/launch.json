@@ -1,0 +1,25 @@
+{
+	"configurations": [
+		{
+			"name": "Launch Program",
+			"program": "${workspaceFolder}/src/main.mjs",
+			"request": "launch",
+			"cwd": "${workspaceFolder}/src",
+			"skipFiles": [
+				"<node_internals>/**"
+			],
+			"args": [
+				"--base",
+				"../test-data/base-coverage.json",
+				"../test-data/new-coverage.json",
+				"--output",
+				"../test-output/outfile.md",
+				"--appName",
+				"My Glorious App",
+				"--appRoot",
+				"/workspaces/srw-ui/main/directory"
+			],
+			"type": "pwa-node"
+		}
+	]
+}
