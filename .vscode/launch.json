@@ -1,25 +1,17 @@
 {
 	"configurations": [
 		{
-			"name": "Launch Program",
-			"program": "${workspaceFolder}/src/main.mjs",
+			"name": "Example",
+			"type": "node",
 			"request": "launch",
-			"cwd": "${workspaceFolder}/src",
-			"skipFiles": [
-				"<node_internals>/**"
-			],
-			"args": [
-				"--base",
-				"../test-data/base-coverage.json",
-				"../test-data/new-coverage.json",
-				"--output",
-				"../test-output/outfile.md",
-				"--appName",
-				"My Glorious App",
-				"--appRoot",
-				"/workspaces/srw-ui/main/directory"
-			],
-			"type": "pwa-node"
-		}
+			"runtimeExecutable": "yarn",
+			"runtimeArgs": ["start"],
+	  
+			"args": ["src/main.ts"],
+			
+			"cwd": "${workspaceRoot}",
+			"internalConsoleOptions": "openOnSessionStart",
+			"skipFiles": ["<node_internals>/**", "node_modules/**"]
+		  }
 	]
 }

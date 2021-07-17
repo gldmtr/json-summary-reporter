@@ -40,5 +40,5 @@ const debugMain = async () => {
 	await writeOutput(commentText, "./test-output/output.md");
 };
 
-main();
-//debugMain();
+//main();
+debugMain();

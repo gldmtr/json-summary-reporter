@@ -65,7 +65,7 @@ export const getCommentBodyLines = (title: string, data: IComparison): string[] 
 	}
 	if (Object.keys(data.unchanged).length > 0) {
 		outputLines.push("");
-		outputLines.push(...getSpoilerSectionLines("Unchanged Files", getComparisonTableLines(data.changed)));
+		outputLines.push(...getSpoilerSectionLines("Unchanged Files", getComparisonTableLines(data.unchanged)));
 	}
 
 	return outputLines;

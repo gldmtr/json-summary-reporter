@@ -171,7 +171,7 @@ describe("Tables", () => {
 			"",
 			"File | Branches | Functions | Lines | Statements",
 			"---|---|---|---|---",
-			"changedFile | ~~1%~~ ✔️ **5%** | ~~2%~~ ✔️ **6%** | ~~3%~~ ✔️ **7%** | ~~4%~~ ✔️ **8%**",
+			"unchangedFile | 1% | 2% | 3% | 4%",
 			"</details>"
 		];
 
