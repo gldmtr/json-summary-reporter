@@ -36,11 +36,7 @@ jobs:
       - name: Build
         run: yarn build
 
-      - name: echo github actor
-        run: echo ${{ env.GITHUB_ACTOR }}
-
       - name: Replace old coverage
-        if: ${{env.GITHUB_ACTOR != '41898282+github-actions[bot]@users.noreply.github.com'}}
         run: |
           rm base-coverage.json
           mv coverage/coverage-summary.json base-coverage.json
