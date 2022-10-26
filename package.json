@@ -10,28 +10,28 @@
     "lint": "eslint src --ext .ts",
     "test": "jest",
     "test:ci": "jest --config=./jest.config.js --collectCoverage --ci",
-    "build": "ncc build src/main.ts",
-    "start": "ts-node src/main.ts --nolazy -r ts-node/register/transpile-only"
+    "build": "ncc build src/index.ts",
+    "start": "ts-node src/index.ts --nolazy -r ts-node/register/transpile-only"
   },
   "devDependencies": {
-    "@babel/core": "^7.14.6",
-    "@babel/preset-env": "^7.14.7",
-    "@babel/preset-typescript": "^7.14.5",
-    "@types/jest": "^26.0.24",
+    "@babel/core": "^7.19.6",
+    "@babel/preset-env": "^7.19.4",
+    "@babel/preset-typescript": "^7.18.6",
+    "@types/jest": "^29.2.0",
     "@types/node": "^16.3.3",
-    "@typescript-eslint/eslint-plugin": "^4.28.3",
-    "@typescript-eslint/parser": "^4.28.3",
-    "babel-jest": "^27.0.6",
-    "eslint": "^7.30.0",
-    "jest": "^27.0.6",
+    "@typescript-eslint/eslint-plugin": "^5.41.0",
+    "@typescript-eslint/parser": "^5.41.0",
+    "babel-jest": "^29.2.2",
+    "eslint": "^8.26.0",
+    "jest": "^29.2.2",
     "jest-junit": "^12.2.0",
-    "prettier": "2.3.2",
-    "ts-node": "^10.1.0",
-    "typescript": "^4.3.5"
+    "prettier": "2.7.1",
+    "ts-node": "^10.9.1",
+    "typescript": "^4.8.4"
   },
   "dependencies": {
-    "@actions/core": "^1.4.0",
-    "@actions/github": "^5.0.0",
-    "@vercel/ncc": "^0.29.0"
+    "@actions/core": "^1.10.0",
+    "@actions/github": "^5.1.1",
+    "@vercel/ncc": "^0.34.0"
   }
 }

@@ -1,9 +1,5 @@
 module.exports = {
-	"collectCoverageFrom": [
-		"src/**/*"
-	],
-	"coverageReporters": [
-		"text", "text-summary", "json-summary", "lcovonly"
-	],
-	"reporters": ["default", "jest-junit"]
-}
+  collectCoverageFrom: ["src/**/*"],
+  coverageReporters: ["text", "text-summary", "json-summary", "lcovonly"],
+  reporters: ["default", "jest-junit"],
+};

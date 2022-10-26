@@ -23,6 +23,10 @@ inputs:
     description: "If true, will always comment, even if there were no changes in coverage (optional, defaults to false)"
     required: false
     default: false
+  exclude-unchanged-files:
+    description: "If true, will exclude unchanged files from comment"
+    required: false
+    default: false
 runs:
-  using: "node12"
+  using: "node16"
   main: "dist/index.js"
